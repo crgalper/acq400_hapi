@@ -9,8 +9,17 @@ import os
 import signal
 import threading
 
+def disable_trigger(master):
 
+    # print("WARNING: REMOVEME temporary fudge while we get the sync trigger right")
+    # master.s0.SIG_SYNC_OUT_TRG_DX = 'd0'
+    master.s0.SIG_SRC_TRG_0 = 'DSP0'
+    master.s0.SIG_SRC_TRG_1 = 'DSP1'
+    return None
 
+def enable_trigger(master):
+    master.s0.SIG_SRC_TRG_0 = 'EXT'
+    master.s0.SIG_SRC_TRG_1 = 'STRIG'
 
 def expand_role(args, urole):
     # fpmaster          # fpclk, fptrg
@@ -38,7 +47,7 @@ def configure_slave(name, args, postfix):
 def run_shot(args):
     master = acq400_hapi.Acq400(args.uuts[0])
     if args.enable_trigger:
-        master.enable_trigger()
+        enable_trigger(master)
         return
 
     args.postfix = []       # master specials
@@ -50,11 +59,11 @@ def run_shot(args):
                                             args.fclk, args.fin, " ".join(args.postfix), " ".join(postfix))
 
     if args.external_trigger:
-        master.disable_trigger()
+        disable_trigger(master)
     else:
         # print("WARNING: REMOVEME temporary fudge while we get the sync trigger right")
         # master.s0.SIG_SYNC_OUT_TRG_DX = 'd1'
-        print("")
+        print ""
         # enable_trigger(master)
 
     # now run all the slave in parallel. We can do this because they do not share data.

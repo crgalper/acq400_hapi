@@ -4,8 +4,6 @@
 
 """
 
-# PGMWAS here make the retry REWRITE!
-
 import sys
 import acq400_hapi
 import argparse
@@ -98,19 +96,11 @@ def run_test(args):
         for f in FREQS_MHz:
             fA = f*1000000
             fB = next_freq(f)*1000000
-            write_retry = 0
-            pass = False
             
-            while not pass:
-                if write_retry > 3:
-                    print("FAIL FAIL FAIL on write retry")
-                    break
-
-                set_freq(uut, uut.ddsA, fA)
-                set_freq(uut, uut.ddsB, fB)
+            set_freq(uut, uut.ddsA, fA)
+            set_freq(uut, uut.ddsB, fB)
             
-                pass = verify_freq(uut, test, fA, fB)
-                write_retry += 1
+            verify_freq(uut, test, fA, fB)
     
 def run_main():  
     parser = argparse.ArgumentParser(description='radcelf-chirp-init')

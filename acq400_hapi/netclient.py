@@ -13,8 +13,6 @@ import socket
 import re
 import sys
 import os
-from threading import Lock
-
 try:
     from future import builtins
     from builtins import input
@@ -53,8 +51,7 @@ class Netclient:
     trace = int(os.getenv("NETCLIENT_TRACE", "0"))   
                 
     def __init__(self, addr, port) :
-        if Netclient.trace:
-            print("Netclient.init {} {}".format(addr, port))
+        print("Netclient.init {} {}".format(addr, port))
         self.buffer = ""
         self.__addr = addr
         self.__port = int(port)
@@ -63,7 +60,7 @@ class Netclient:
         except socket.error as e:
             print("Netclient {}.{} connect fail {}".format(addr, port, e))
             raise e
-        if Netclient.trace > 1:
+        if Netclient.trace:
             print("Netclient(%s, %d) connect" % (self.__addr, self.__port))
         self.sock.connect((self.__addr, self.__port))
 
@@ -98,20 +95,7 @@ class Logclient(Netclient):
         return self.receive_message(self.termex)
 
 
-
-
 class Siteclient(Netclient):   
-    def synchronized(f):
-        def _synchronized(self, *args, **kwargs):      
-            self.lock.acquire()
-            try:
-                rc = f(self, *args, **kwargs)
-            finally:                
-                self.lock.release()
-            return rc
-
-        return _synchronized
-
     """Netclient optimised for site service, may be multi-line response.
     
     Autodetects all knobs and holds them as properties for simple script-like
@@ -121,8 +105,7 @@ class Siteclient(Netclient):
     prevent_autocreate = False
     pat = re.compile(r":")
     
-    @synchronized
-    def sr(self, message):        
+    def sr(self, message):
         """send a command and receive a reply
         
         Args:
@@ -196,7 +179,6 @@ class Siteclient(Netclient):
     def __init__(self, addr, port):
 #        print("Siteclient.init")
         self.knobs = {}
-        self.lock = Lock()
         
         self.show_responses = False
         Netclient.__init__(self, addr, port) 

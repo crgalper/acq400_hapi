@@ -36,23 +36,9 @@ import argparse
 
 def run_shot(args):
     uuts = [acq400_hapi.Acq400(u) for u in args.uuts]
-
-    acq400_hapi.cleanup.init()
-
-    for uut in uuts:
-        if args.transient != 'notouch':
-            uut.s0.transient = args.transient.replace(',', ' ')
-#        if hasattr(uut.s0, 'TIM_CTRL_LOCK'):
-#            print("LOCKDOWN {}".format(uut))
-#            uut.s0.TIM_CTRL_LOCK = 1
-
-    shot_controller = acq400_hapi.ShotController(uuts)
-
+    
     try:
-        print("Soft trigger is {}".format(args.soft_trigger))
-        
-        shot_controller.run_shot(soft_trigger=args.soft_trigger)
-        acq400_hapi.cleanup.sleep(1.0)            
+        uuts[0].statmon.wait_stopped()
 
     except acq400_hapi.cleanup.ExitCommand:
         print("ExitCommand raised and caught")
@@ -62,9 +48,7 @@ def run_shot(args):
 # execution starts here
 
 def run_main():
-    parser = argparse.ArgumentParser(description='run capture, with optional transient configuration')
-    parser.add_argument('--soft_trigger', type=int, default=False)
-    parser.add_argument('--transient', default='notouch', help='transient control string use commas rather than spaces')
+    parser = argparse.ArgumentParser(description='calls statmon.wait_stopped of given uuts')
     parser.add_argument('uuts', nargs='+', help='uut1 [uut2..]')
     run_shot(parser.parse_args())
 

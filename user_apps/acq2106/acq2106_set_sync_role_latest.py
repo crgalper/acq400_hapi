@@ -82,14 +82,10 @@ def run_main(parser):
             role = "slave"
             trg = "1,%d,%d" % (1 if mtrg=="soft" else 0, rf(edge))
             clkdiv = parser.clkdiv
-            uut.s1.CLKDIV = clkdiv # TODO: check if this works for thomson
             sync_trg_to_clk(uut)
         else:
             trg = "1,%d,%d" % (0, rf(parser.trg_edge))
-            #clkdiv = 1
-
-            clkdiv = parser.clkdiv # TODO: check if this works for thomson
-
+            clkdiv = 1
             uut.set_sync_routing_slave()
             uut.s1.CLKDIV = clkdiv
             sync_trg_to_clk(uut, parser.slave_sync_trg_to_clk)
@@ -103,7 +99,7 @@ def run_main(parser):
         run_link_test(parser, uuts[0], uuts[1])
 
     if not parser.master_trg.startswith("soft"):
-        #input("say when")
+        input("say when")
         uuts[0].set_master_trg(mtrg, edge, enabled=True)       
 
 

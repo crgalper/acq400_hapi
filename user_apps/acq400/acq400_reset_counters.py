@@ -19,22 +19,15 @@ import argparse
 import threading
 
 
-def cs(uut):
-    def _cs():
-        return acq400_hapi.Acq2106 if uut.startswith("acq2106") else acq400_hapi.Acq400
-    return _cs()(uut)
         
 def reset1(uut, s):
-    try:
-        uut.svc[s].RESET_CTR = '1'
-        print("reset {} {} done".format(uut.uut, s))
-    except KeyError:
-        print("WORKTODO KeyError {}")
+    uut.svc[s].RESET_CTR = '1'
+    print "reset {} {} done".format(uut.uut, s)
 
 def reset_counters_threaded(args):
-    uuts = [cs(u) for u in args.uuts]
+    uuts = [acq400_hapi.Acq2106(u) for u in args.uuts]
     sites = args.sites.split(',')
-#    printr(sites)
+    print sites
     threads = []
     for uut in uuts:
         for s in sites:                       
@@ -47,22 +40,22 @@ def reset_counters_threaded(args):
             
             
 def reset_counters_serial(args):
-    uuts = [cs(u) for u in args.uuts]
+    uuts = [acq400_hapi.Acq2106(u) for u in args.uuts]
     sites = args.sites.split(',')
-#    printi(sites)
+    print sites
     
     for uut in uuts:
         for s in sites:
             reset1(uut, s)
   
 def reset2(uutname, sites):
-    uut = cs(uutname)
+    uut = acq400_hapi.Acq2106(uutname)
     for s in sites:
         reset1(uut, s)
         
 def reset_counters_threaded_ultra(args):    
     sites = args.sites.split(',')
-#    print(sites)
+    print sites
     threads = []
     for uutname in args.uuts:                      
         t = threading.Thread(target=reset2, args=(uutname, sites))
