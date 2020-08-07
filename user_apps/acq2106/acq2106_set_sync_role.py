@@ -84,16 +84,20 @@ def run_main(parser):
             clkdiv = parser.clkdiv
             uut.s1.CLKDIV = clkdiv # TODO: check if this works for thomson
             sync_trg_to_clk(uut)
+	    uut.s0.SIG_SYNC_OUT_CLK = "CLK"
+            uut.s0.SIG_SYNC_OUT_CLK_DX = "d2"
+            uut.s0.SIG_SYNC_OUT_TRG = "TRG"
+            uut.s0.SIG_SYNC_OUT_TRG_DX = "d1" 
         else:
             trg = "1,%d,%d" % (0, rf(parser.trg_edge))
-            #clkdiv = 1
-
-            clkdiv = parser.clkdiv # TODO: check if this works for thomson
+            clkdiv = 1
+            #clkdiv = parser.clkdiv # TODO: check if this works for thomson
 
             uut.set_sync_routing_slave()
             uut.s1.CLKDIV = clkdiv
             sync_trg_to_clk(uut, parser.slave_sync_trg_to_clk)
-
+            #uut.s0.SIG_SRC_TRG_0 = "HDMI"
+	   
         uut.s0.SIG_TRG_EXT_RESET = '1'  # self-clears. clear trigger count for easy ref 
 
         uut.s1.trg = trg
